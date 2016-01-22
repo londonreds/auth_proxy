@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/buzzfeed/auth_proxy/providers"
 	"github.com/bmizerany/assert"
+	"github.com/buzzfeed/auth_proxy/providers"
 	"io/ioutil"
 	"log"
 	"net"

@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/buzzfeed/auth_proxy/cookie"
 	"github.com/bmizerany/assert"
+	"github.com/buzzfeed/auth_proxy/cookie"
 )
 
 const secret = "0123456789abcdefghijklmnopqrstuv"
