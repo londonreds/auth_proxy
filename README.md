@@ -1,13 +1,15 @@
-oauth2_proxy
+This is a fork of [bitly/oauth2_proxy](https://github.com/bitly/oauth2_proxy/tree/v2.0.1) at
+v2.0.1 to enable authentication using www.buzzfeed.com user credentials via  [buzzfeed/auth_api](https://github.com/buzzfeed/mono/tree/master/auth_api).
+
+-----------------
+
+auth_proxy
 =================
 
 <small>(This project was renamed from Google Auth Proxy - May 2015)</small>
 
 A reverse proxy that provides authentication using Providers (Google, Github, and others)
-to validate accounts by email, domain or group.
-
-[![Build Status](https://secure.travis-ci.org/bitly/oauth2_proxy.png?branch=master)](http://travis-ci.org/bitly/oauth2_proxy)
-
+to validate accounts by email, domain or group or authentication using BuzzFeed credentials.
 
 ![Sign In Page](https://cloud.githubusercontent.com/assets/45028/4970624/7feb7dd8-6886-11e4-93e0-c9904af44ea8.png)
 
@@ -140,7 +142,7 @@ The environment variables `OAUTH2_PROXY_CLIENT_ID`, `OAUTH2_PROXY_CLIENT_SECRET`
 
 ## SSL Configuration
 
-There are two recommended configurations. 
+There are two recommended configurations.
 
 1) Configure SSL Terminiation with OAuth2 Proxy by providing a `--tls-cert=/path/to/cert.pem` and `--tls-key=/path/to/cert.key`.
 
@@ -170,7 +172,7 @@ Nginx will listen on port `443` and handle SSL connections while proxying to `oa
 `oauth2_proxy` will then authenticate requests for an upstream application. The external endpoint for this example
 would be `https://internal.yourcompany.com/`.
 
-An example Nginx config follows. Note the use of `Strict-Transport-Security` header to pin requests to SSL 
+An example Nginx config follows. Note the use of `Strict-Transport-Security` header to pin requests to SSL
 via [HSTS](http://en.wikipedia.org/wiki/HTTP_Strict_Transport_Security):
 
 ```
@@ -232,4 +234,3 @@ Follow the examples in the [`providers` package](providers/) to define a new
 `Provider` instance. Add a new `case` to
 [`providers.New()`](providers/providers.go) to allow `oauth2_proxy` to use the
 new `Provider`.
-

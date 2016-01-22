@@ -14,8 +14,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bitly/oauth2_proxy/cookie"
-	"github.com/bitly/oauth2_proxy/providers"
+	"github.com/buzzfeed/auth_proxy/cookie"
+	"github.com/buzzfeed/auth_proxy/providers"
 )
 
 type OauthProxy struct {
