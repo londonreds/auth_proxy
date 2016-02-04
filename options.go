@@ -100,6 +100,13 @@ func (o *Options) Validate() error {
 	if o.CookieSecret == "" {
 		msgs = append(msgs, "missing setting: cookie-secret")
 	}
+	if o.ClientID == "" {
+		msgs = append(msgs, "missing setting: client-id")
+	}
+	if o.ClientSecret == "" {
+		msgs = append(msgs, "missing setting: client-secret")
+	}
+
 	o.redirectUrl, msgs = parseUrl(o.RedirectUrl, "redirect", msgs)
 
 	for _, u := range o.Upstreams {
