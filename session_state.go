@@ -1,12 +1,10 @@
-package providers
+package main
 
 import (
 	"fmt"
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/buzzfeed/auth_proxy/cookie"
 )
 
 type SessionState struct {
@@ -38,7 +36,7 @@ func (s *SessionState) String() string {
 	return o + "}"
 }
 
-func (s *SessionState) EncodeSessionState(c *cookie.Cipher) (string, error) {
+func (s *SessionState) EncodeSessionState(c *CookieCipher) (string, error) {
 	if c == nil || s.AccessToken == "" {
 		return s.userOrEmail(), nil
 	}
@@ -53,7 +51,7 @@ func (s *SessionState) userOrEmail() string {
 	return u
 }
 
-func (s *SessionState) EncryptedString(c *cookie.Cipher) (string, error) {
+func (s *SessionState) EncryptedString(c *CookieCipher) (string, error) {
 	var err error
 	if c == nil {
 		panic("error. missing cipher")
@@ -75,7 +73,7 @@ func (s *SessionState) EncryptedString(c *cookie.Cipher) (string, error) {
 	return fmt.Sprintf("%s|%s|%d|%s", s.userOrEmail(), a, s.ExpiresOn.Unix(), r), nil
 }
 
-func DecodeSessionState(v string, c *cookie.Cipher) (s *SessionState, err error) {
+func DecodeSessionState(v string, c *CookieCipher) (s *SessionState, err error) {
 	chunks := strings.Split(v, "|")
 	if len(chunks) == 1 {
 		if strings.Contains(chunks[0], "@") {

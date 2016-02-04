@@ -13,9 +13,6 @@ import (
 	"regexp"
 	"strings"
 	"time"
-
-	"github.com/buzzfeed/auth_proxy/cookie"
-	"github.com/buzzfeed/auth_proxy/providers"
 )
 
 type OauthProxy struct {
@@ -35,7 +32,7 @@ type OauthProxy struct {
 	OauthCallbackPath string
 
 	redirectUrl         *url.URL // the url to receive requests at
-	provider            providers.Provider
+	provider            Provider
 	ProxyPrefix         string
 	SignInMessage       string
 	HtpasswdFile        *HtpasswdFile
@@ -43,7 +40,7 @@ type OauthProxy struct {
 	serveMux            http.Handler
 	PassBasicAuth       bool
 	PassAccessToken     bool
-	CookieCipher        *cookie.Cipher
+	CookieCipher        *CookieCipher
 	skipAuthRegex       []string
 	compiledRegex       []*regexp.Regexp
 	templates           *template.Template
@@ -117,10 +114,10 @@ func NewOauthProxy(opts *Options, validator func(string) bool) *OauthProxy {
 
 	log.Printf("Cookie settings: name:%s secure(https):%v httponly:%v expiry:%s domain:%s refresh:%s", opts.CookieName, opts.CookieSecure, opts.CookieHttpOnly, opts.CookieExpire, domain, refresh)
 
-	var cipher *cookie.Cipher
+	var cipher *CookieCipher
 	if opts.PassAccessToken || (opts.CookieRefresh != time.Duration(0)) {
 		var err error
-		cipher, err = cookie.NewCipher(opts.CookieSecret)
+		cipher, err = NewCookieCipher(opts.CookieSecret)
 		if err != nil {
 			log.Fatal("error creating AES cipher with "+
 				"cookie-secret ", opts.CookieSecret, ": ", err)
@@ -178,7 +175,7 @@ func (p *OauthProxy) displayCustomLoginForm() bool {
 	return (p.HtpasswdFile != nil && p.DisplayHtpasswdForm) || p.AuthApi != nil
 }
 
-func (p *OauthProxy) redeemCode(host, code string) (s *providers.SessionState, err error) {
+func (p *OauthProxy) redeemCode(host, code string) (s *SessionState, err error) {
 	if code == "" {
 		return nil, errors.New("missing code")
 	}
@@ -207,7 +204,7 @@ func (p *OauthProxy) MakeCookie(req *http.Request, value string, expiration time
 	}
 
 	if value != "" {
-		value = cookie.SignedValue(p.CookieSeed, p.CookieName, value, now)
+		value = SignedCookieValue(p.CookieSeed, p.CookieName, value, now)
 	}
 	return &http.Cookie{
 		Name:     p.CookieName,
@@ -228,14 +225,14 @@ func (p *OauthProxy) SetCookie(rw http.ResponseWriter, req *http.Request, val st
 	http.SetCookie(rw, p.MakeCookie(req, val, p.CookieExpire, time.Now()))
 }
 
-func (p *OauthProxy) LoadCookiedSession(req *http.Request) (*providers.SessionState, time.Duration, error) {
+func (p *OauthProxy) LoadCookiedSession(req *http.Request) (*SessionState, time.Duration, error) {
 	var age time.Duration
 	c, err := req.Cookie(p.CookieName)
 	if err != nil {
 		// always http.ErrNoCookie
 		return nil, age, fmt.Errorf("Cookie %q not present", p.CookieName)
 	}
-	val, timestamp, ok := cookie.Validate(c, p.CookieSeed, p.CookieExpire)
+	val, timestamp, ok := ValidateCookie(c, p.CookieSeed, p.CookieExpire)
 	if !ok {
 		return nil, age, errors.New("Cookie Signature not valid")
 	}
@@ -249,7 +246,7 @@ func (p *OauthProxy) LoadCookiedSession(req *http.Request) (*providers.SessionSt
 	return session, age, nil
 }
 
-func (p *OauthProxy) SaveSession(rw http.ResponseWriter, req *http.Request, s *providers.SessionState) error {
+func (p *OauthProxy) SaveSession(rw http.ResponseWriter, req *http.Request, s *SessionState) error {
 	value, err := p.provider.CookieForSession(s, p.CookieCipher)
 	if err != nil {
 		return err
@@ -395,7 +392,7 @@ func (p *OauthProxy) SignIn(rw http.ResponseWriter, req *http.Request) {
 
 	user, ok := p.ManualSignIn(rw, req)
 	if ok {
-		session := &providers.SessionState{User: user}
+		session := &SessionState{User: user}
 		p.SaveSession(rw, req, session)
 		http.Redirect(rw, req, redirect, 302)
 	} else {
@@ -546,7 +543,7 @@ func (p *OauthProxy) Proxy(rw http.ResponseWriter, req *http.Request) {
 	p.serveMux.ServeHTTP(rw, req)
 }
 
-func (p *OauthProxy) CheckBasicAuth(req *http.Request) (*providers.SessionState, error) {
+func (p *OauthProxy) CheckBasicAuth(req *http.Request) (*SessionState, error) {
 	if p.HtpasswdFile == nil {
 		return nil, nil
 	}
@@ -568,7 +565,7 @@ func (p *OauthProxy) CheckBasicAuth(req *http.Request) (*providers.SessionState,
 	}
 	if p.HtpasswdFile.Validate(pair[0], pair[1]) {
 		log.Printf("authenticated %q via basic auth", pair[0])
-		return &providers.SessionState{User: pair[0]}, nil
+		return &SessionState{User: pair[0]}, nil
 	}
 	return nil, fmt.Errorf("%s not in HtpasswdFile", pair[0])
 }

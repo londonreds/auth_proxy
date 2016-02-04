@@ -1,4 +1,4 @@
-package providers
+package main
 
 import (
 	"errors"
@@ -6,8 +6,6 @@ import (
 	"log"
 	"net/http"
 	"net/url"
-
-	"github.com/buzzfeed/auth_proxy/api"
 )
 
 type LinkedInProvider struct {
@@ -58,7 +56,7 @@ func (p *LinkedInProvider) GetEmailAddress(s *SessionState) (string, error) {
 	}
 	req.Header = getLinkedInHeader(s.AccessToken)
 
-	json, err := api.Request(req)
+	json, err := Request(req)
 	if err != nil {
 		log.Printf("failed making request %s", err)
 		return "", err

@@ -6,8 +6,6 @@ import (
 	"regexp"
 	"strings"
 	"time"
-
-	"github.com/buzzfeed/auth_proxy/providers"
 )
 
 // Configuration Options that can be set by Command Line Flag, or Config File
@@ -61,7 +59,7 @@ type Options struct {
 	redirectUrl   *url.URL
 	proxyUrls     []*url.URL
 	CompiledRegex []*regexp.Regexp
-	provider      providers.Provider
+	provider      Provider
 	authApiUrl    *url.URL
 }
 
@@ -156,21 +154,21 @@ func (o *Options) Validate() error {
 
 	if len(msgs) != 0 {
 		return fmt.Errorf("Invalid configuration:\n  %s",
-			strings.Join(msgs, "\n  "))
+			strings.Join(msgs, "\n	"))
 	}
 	return nil
 }
 
 func parseProviderInfo(o *Options, msgs []string) []string {
-	p := &providers.ProviderData{Scope: o.Scope, ClientID: o.ClientID, ClientSecret: o.ClientSecret}
+	p := &ProviderData{Scope: o.Scope, ClientID: o.ClientID, ClientSecret: o.ClientSecret}
 	p.LoginUrl, msgs = parseUrl(o.LoginUrl, "login", msgs)
 	p.RedeemUrl, msgs = parseUrl(o.RedeemUrl, "redeem", msgs)
 	p.ProfileUrl, msgs = parseUrl(o.ProfileUrl, "profile", msgs)
 	p.ValidateUrl, msgs = parseUrl(o.ValidateUrl, "validate", msgs)
 
-	o.provider = providers.New(o.Provider, p)
+	o.provider = New(o.Provider, p)
 	switch p := o.provider.(type) {
-	case *providers.GitHubProvider:
+	case *GitHubProvider:
 		p.SetOrgTeam(o.GitHubOrg, o.GitHubTeam)
 	}
 	return msgs

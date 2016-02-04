@@ -1,4 +1,4 @@
-package providers
+package main
 
 import (
 	"bytes"
@@ -9,8 +9,6 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
-
-	"github.com/buzzfeed/auth_proxy/cookie"
 )
 
 func (p *ProviderData) Redeem(redirectUrl, code string) (s *SessionState, err error) {
@@ -92,12 +90,12 @@ func (p *ProviderData) GetLoginURL(redirectURI, finalRedirect string) string {
 }
 
 // CookieForSession serializes a session state for storage in a cookie
-func (p *ProviderData) CookieForSession(s *SessionState, c *cookie.Cipher) (string, error) {
+func (p *ProviderData) CookieForSession(s *SessionState, c *CookieCipher) (string, error) {
 	return s.EncodeSessionState(c)
 }
 
 // SessionFromCookie deserializes a session from a cookie value
-func (p *ProviderData) SessionFromCookie(v string, c *cookie.Cipher) (s *SessionState, err error) {
+func (p *ProviderData) SessionFromCookie(v string, c *CookieCipher) (s *SessionState, err error) {
 	return DecodeSessionState(v, c)
 }
 

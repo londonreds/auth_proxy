@@ -1,4 +1,4 @@
-package cookie
+package main
 
 import (
 	"crypto/aes"
@@ -19,7 +19,7 @@ import (
 // additionally, the 'value' is encrypted so it's opaque to the browser
 
 // Validate ensures a cookie is properly signed
-func Validate(cookie *http.Cookie, seed string, expiration time.Duration) (value string, t time.Time, ok bool) {
+func ValidateCookie(cookie *http.Cookie, seed string, expiration time.Duration) (value string, t time.Time, ok bool) {
 	// value, timestamp, sig
 	parts := strings.Split(cookie.Value, "|")
 	if len(parts) != 3 {
@@ -50,7 +50,7 @@ func Validate(cookie *http.Cookie, seed string, expiration time.Duration) (value
 }
 
 // SignedValue returns a cookie that is signed and can later be checked with Validate
-func SignedValue(seed string, key string, value string, now time.Time) string {
+func SignedCookieValue(seed string, key string, value string, now time.Time) string {
 	encodedValue := base64.URLEncoding.EncodeToString([]byte(value))
 	timeStr := fmt.Sprintf("%d", now.Unix())
 	sig := cookieSignature(seed, key, encodedValue, timeStr)
@@ -79,22 +79,22 @@ func checkHmac(input, expected string) bool {
 	return false
 }
 
-// Cipher provides methods to encrypt and decrypt cookie values
-type Cipher struct {
+// CookieCipher provides methods to encrypt and decrypt cookie values
+type CookieCipher struct {
 	cipher.Block
 }
 
-// NewCipher returns a new aes Cipher for encrypting cookie values
-func NewCipher(secret string) (*Cipher, error) {
+// NewCookieCipher returns a new aes CookieCipher for encrypting cookie values
+func NewCookieCipher(secret string) (*CookieCipher, error) {
 	c, err := aes.NewCipher([]byte(secret))
 	if err != nil {
 		return nil, err
 	}
-	return &Cipher{Block: c}, err
+	return &CookieCipher{Block: c}, err
 }
 
 // Encrypt a value for use in a cookie
-func (c *Cipher) Encrypt(value string) (string, error) {
+func (c *CookieCipher) Encrypt(value string) (string, error) {
 	ciphertext := make([]byte, aes.BlockSize+len(value))
 	iv := ciphertext[:aes.BlockSize]
 	if _, err := io.ReadFull(rand.Reader, iv); err != nil {
@@ -107,7 +107,7 @@ func (c *Cipher) Encrypt(value string) (string, error) {
 }
 
 // Decrypt a value from a cookie to it's original string
-func (c *Cipher) Decrypt(s string) (string, error) {
+func (c *CookieCipher) Decrypt(s string) (string, error) {
 	encrypted, err := base64.StdEncoding.DecodeString(s)
 	if err != nil {
 		return "", fmt.Errorf("failed to decrypt cookie value %s", err)

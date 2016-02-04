@@ -1,4 +1,4 @@
-package providers
+package main
 
 import (
 	"strings"
@@ -6,16 +6,15 @@ import (
 	"time"
 
 	"github.com/bmizerany/assert"
-	"github.com/buzzfeed/auth_proxy/cookie"
 )
 
 const secret = "0123456789abcdefghijklmnopqrstuv"
 const altSecret = "0000000000abcdefghijklmnopqrstuv"
 
 func TestSessionStateSerialization(t *testing.T) {
-	c, err := cookie.NewCipher(secret)
+	c, err := NewCookieCipher(secret)
 	assert.Equal(t, nil, err)
-	c2, err := cookie.NewCipher(altSecret)
+	c2, err := cookie.NewCookieCipher(altSecret)
 	assert.Equal(t, nil, err)
 	s := &SessionState{
 		Email:        "user@domain.com",

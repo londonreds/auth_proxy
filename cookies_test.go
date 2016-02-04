@@ -1,4 +1,4 @@
-package cookie
+package main
 
 import (
 	"testing"

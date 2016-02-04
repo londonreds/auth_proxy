@@ -1,11 +1,9 @@
-package providers
+package main
 
 import (
 	"log"
 	"net/http"
 	"net/url"
-
-	"github.com/buzzfeed/auth_proxy/api"
 )
 
 type MyUsaProvider struct {
@@ -49,10 +47,10 @@ func (p *MyUsaProvider) GetEmailAddress(s *SessionState) (string, error) {
 		log.Printf("failed building request %s", err)
 		return "", err
 	}
-	json, err := api.Request(req)
+	jsonData, err := Request(req)
 	if err != nil {
 		log.Printf("failed making request %s", err)
 		return "", err
 	}
-	return json.Get("email").String()
+	return jsonData.Get("email").String()
 }

@@ -1,8 +1,4 @@
-package providers
-
-import (
-	"github.com/buzzfeed/auth_proxy/cookie"
-)
+package main
 
 type Provider interface {
 	Data() *ProviderData
@@ -11,8 +7,8 @@ type Provider interface {
 	ValidateSessionState(*SessionState) bool
 	GetLoginURL(redirectURI, finalRedirect string) string
 	RefreshSessionIfNeeded(*SessionState) (bool, error)
-	SessionFromCookie(string, *cookie.Cipher) (*SessionState, error)
-	CookieForSession(*SessionState, *cookie.Cipher) (string, error)
+	SessionFromCookie(string, *CookieCipher) (*SessionState, error)
+	CookieForSession(*SessionState, *CookieCipher) (string, error)
 }
 
 func New(provider string, p *ProviderData) Provider {

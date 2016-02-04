@@ -1,12 +1,10 @@
-package providers
+package main
 
 import (
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
-
-	"github.com/buzzfeed/auth_proxy/api"
 )
 
 // validateToken returns true if token is valid
@@ -19,7 +17,7 @@ func validateToken(p Provider, access_token string, header http.Header) bool {
 		params := url.Values{"access_token": {access_token}}
 		endpoint = endpoint + "?" + params.Encode()
 	}
-	resp, err := api.RequestUnparsedResponse(endpoint, header)
+	resp, err := RequestUnparsedResponse(endpoint, header)
 	if err != nil {
 		log.Printf("GET %s", endpoint)
 		log.Printf("token validation request failed: %s", err)

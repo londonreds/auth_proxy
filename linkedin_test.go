@@ -1,4 +1,4 @@
-package providers
+package main
 
 import (
 	"github.com/bmizerany/assert"
