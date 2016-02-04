@@ -47,6 +47,8 @@ type OauthProxy struct {
 	skipAuthRegex       []string
 	compiledRegex       []*regexp.Regexp
 	templates           *template.Template
+
+	AuthApi *AuthApi
 }
 
 type UpstreamProxy struct {
@@ -173,7 +175,7 @@ func (p *OauthProxy) GetRedirectURI(host string) string {
 }
 
 func (p *OauthProxy) displayCustomLoginForm() bool {
-	return p.HtpasswdFile != nil && p.DisplayHtpasswdForm
+	return (p.HtpasswdFile != nil && p.DisplayHtpasswdForm) || p.AuthApi != nil
 }
 
 func (p *OauthProxy) redeemCode(host, code string) (s *providers.SessionState, err error) {
@@ -307,7 +309,7 @@ func (p *OauthProxy) SignInPage(rw http.ResponseWriter, req *http.Request, code 
 }
 
 func (p *OauthProxy) ManualSignIn(rw http.ResponseWriter, req *http.Request) (string, bool) {
-	if req.Method != "POST" || p.HtpasswdFile == nil {
+	if req.Method != "POST" || (p.HtpasswdFile == nil && p.AuthApi == nil) {
 		return "", false
 	}
 	user := req.FormValue("username")
@@ -315,11 +317,19 @@ func (p *OauthProxy) ManualSignIn(rw http.ResponseWriter, req *http.Request) (st
 	if user == "" {
 		return "", false
 	}
-	// check auth
-	if p.HtpasswdFile.Validate(user, passwd) {
+
+	// check basic auth
+	if p.HtpasswdFile != nil && p.HtpasswdFile.Validate(user, passwd) {
 		log.Printf("authenticated %q via HtpasswdFile", user)
 		return user, true
 	}
+
+	// check auth api auth
+	if p.AuthApi != nil && p.AuthApi.Validate(user, passwd) {
+		log.Printf("authenticated %q via AuthApi", user)
+		return user, true
+	}
+
 	return "", false
 }
 

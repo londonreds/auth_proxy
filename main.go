@@ -63,10 +63,13 @@ func main() {
 	flagSet.String("validate-url", "", "Access token validation endpoint")
 	flagSet.String("scope", "", "Oauth scope specification")
 
+	flagSet.String("auth-api-url", "", "[http://]<addr>:<port>/<path> of the BuzzFeed Auth API endpoint")
+	flagSet.Bool("display-auth-api-form", true, "display authentication form for authenticating with BuzzFeed Auth API endpoint")
+
 	flagSet.Parse(os.Args[1:])
 
 	if *showVersion {
-		fmt.Printf("oauth2_proxy v%s (built with %s)\n", VERSION, runtime.Version())
+		fmt.Printf("auth_proxy v%s (built with %s)\n", VERSION, runtime.Version())
 		return
 	}
 
@@ -105,6 +108,14 @@ func main() {
 		oauthproxy.DisplayHtpasswdForm = opts.DisplayHtpasswdForm
 		if err != nil {
 			log.Fatalf("FATAL: unable to open %s %s", opts.HtpasswdFile, err)
+		}
+	}
+
+	if opts.AuthApiUrl != "" {
+		log.Printf("using auth api %s", opts.AuthApiUrl)
+		oauthproxy.AuthApi, err = NewAuthApiFromUrl(opts.AuthApiUrl)
+		if err != nil {
+			log.Fatalf("Fatal: invalid auth api url %s", opts.AuthApiUrl)
 		}
 	}
 

@@ -1,6 +1,12 @@
 This is a fork of [bitly/oauth2_proxy](https://github.com/bitly/oauth2_proxy/tree/v2.0.1) at
 v2.0.1 to enable authentication using www.buzzfeed.com user credentials via  [buzzfeed/auth_api](https://github.com/buzzfeed/mono/tree/master/auth_api).
 
+A `Vagrantfile` has been included for convenience to compile using go `v1.4.2`.
+`$GOPATH` has been set to `/opt/go` and `auth_proxy` has been synced to `/opt/go/src/github.com/buzzfeed/auth_proxy`.
+
+You can run `gpm install` and `go install`.
+`$GOPATH/bin` has been included on `$PATH`, so `auth_proxy` is easy to run.
+
 -----------------
 
 auth_proxy
@@ -19,14 +25,14 @@ to validate accounts by email, domain or group or authentication using BuzzFeed 
 
 ## Installation
 
-1. Download [Prebuilt Binary](https://github.com/bitly/oauth2_proxy/releases) (current release is `v2.0.1`) or build with `$ go get github.com/bitly/oauth2_proxy` which will put the binary in `$GOROOT/bin`
+1. Download [Prebuilt Binary](https://github.com/buzzfeed/auth_proxy/releases) (current release is `v2.0.1`) or build with `$ go get github.com/buzzfeed/auth_proxy` which will put the binary in `$GOROOT/bin`
 2. Select a Provider and Register an OAuth Application with a Provider
 3. Configure OAuth2 Proxy using config file, command line options, or environment variables
 4. Configure SSL or Deploy behind a SSL endpoint (example provided for Nginx)
 
 ## OAuth Provider Configuration
 
-You will need to register an OAuth application with a Provider (Google, Github or another provider), and configure it with Redirect URI(s) for the domain you intend to run `oauth2_proxy` on.
+You will need to register an OAuth application with a Provider (Google, Github or another provider), and configure it with Redirect URI(s) for the domain you intend to run `auth_proxy` on.
 
 Valid providers are :
 
@@ -47,7 +53,7 @@ For Google, the registration steps are:
    * The Application Type should be **Web application**
    * Enter your domain in the Authorized Javascript Origins `https://internal.yourcompany.com`
    * Enter the correct Authorized Redirect URL `https://internal.yourcompany.com/oauth2/callback`
-     * NOTE: `oauth2_proxy` will _only_ callback on the path `/oauth2/callback`
+     * NOTE: `auth_proxy` will _only_ callback on the path `/oauth2/callback`
 4. Under "APIs & Auth" choose "Consent Screen"
    * Fill in the necessary fields and Save (this is _required_)
 5. Take note of the **Client ID** and **Client Secret**
@@ -86,7 +92,7 @@ To authorize by email domain use `--email-domain=yourcompany.com`. To authorize 
 
 ## Configuration
 
-`oauth2_proxy` can be configured via [config file](#config-file), [command line options](#command-line-options) or [environment variables](#environment-variables).
+`auth_proxy` can be configured via [config file](#config-file), [command line options](#command-line-options) or [environment variables](#environment-variables).
 
 ### Config File
 
@@ -95,7 +101,8 @@ An example [oauth2_proxy.cfg](contrib/oauth2_proxy.cfg.example) config file is i
 ### Command Line Options
 
 ```
-Usage of oauth2_proxy:
+Usage of auth_proxy:
+  -auth-api-url="": [http://]<addr>:<port>/<path> of the BuzzFeed Auth API endpoint
   -authenticated-emails-file="": authenticate against emails via file (one per line)
   -client-id="": the OAuth Client ID: ie: "123456.apps.googleusercontent.com"
   -client-secret="": the OAuth Client Secret
@@ -146,10 +153,10 @@ There are two recommended configurations.
 
 1) Configure SSL Terminiation with OAuth2 Proxy by providing a `--tls-cert=/path/to/cert.pem` and `--tls-key=/path/to/cert.key`.
 
-The command line to run `oauth2_proxy` in this configuration would look like this:
+The command line to run `auth_proxy` in this configuration would look like this:
 
 ```bash
-./oauth2_proxy \
+./auth_proxy \
    --email-domain="yourcompany.com"  \
    --upstream=http://127.0.0.1:8080/ \
    --tls-cert=/path/to/cert.pem \
@@ -164,12 +171,12 @@ The command line to run `oauth2_proxy` in this configuration would look like thi
 
 2) Configure SSL Termination with [Nginx](http://nginx.org/) (example config below), Amazon ELB, Google Cloud Platform Load Balancing, or ....
 
-Because `oauth2_proxy` listens on `127.0.0.1:4180` by default, to listen on all interfaces (needed when using an
+Because `auth_proxy` listens on `127.0.0.1:4180` by default, to listen on all interfaces (needed when using an
 external load balancer like Amazon ELB or Google Platform Load Balancing) use `--http-address="0.0.0.0:4180"` or
 `--http-address="http://:4180"`.
 
 Nginx will listen on port `443` and handle SSL connections while proxying to `oauth2_proxy` on port `4180`.
-`oauth2_proxy` will then authenticate requests for an upstream application. The external endpoint for this example
+`auth_proxy` will then authenticate requests for an upstream application. The external endpoint for this example
 would be `https://internal.yourcompany.com/`.
 
 An example Nginx config follows. Note the use of `Strict-Transport-Security` header to pin requests to SSL
@@ -195,10 +202,10 @@ server {
 }
 ```
 
-The command line to run `oauth2_proxy` in this configuration would look like this:
+The command line to run `auth_proxy` in this configuration would look like this:
 
 ```bash
-./oauth2_proxy \
+./auth_proxy \
    --email-domain="yourcompany.com"  \
    --upstream=http://127.0.0.1:8080/ \
    --cookie-secret=... \
@@ -232,5 +239,5 @@ OAuth2 Proxy logs requests to stdout in a format similar to Apache Combined Log.
 
 Follow the examples in the [`providers` package](providers/) to define a new
 `Provider` instance. Add a new `case` to
-[`providers.New()`](providers/providers.go) to allow `oauth2_proxy` to use the
+[`providers.New()`](providers/providers.go) to allow `auth_proxy` to use the
 new `Provider`.

@@ -54,11 +54,15 @@ type Options struct {
 
 	RequestLogging bool `flag:"request-logging" cfg:"request_logging"`
 
+	// BuzzFeed Auth API options
+	AuthApiUrl string `flag:"auth-api-url" cfg:"auth_api_url"`
+
 	// internal values that are set after config validation
 	redirectUrl   *url.URL
 	proxyUrls     []*url.URL
 	CompiledRegex []*regexp.Regexp
 	provider      providers.Provider
+	authApiUrl    *url.URL
 }
 
 func NewOptions() *Options {
@@ -96,13 +100,6 @@ func (o *Options) Validate() error {
 	if o.CookieSecret == "" {
 		msgs = append(msgs, "missing setting: cookie-secret")
 	}
-	if o.ClientID == "" {
-		msgs = append(msgs, "missing setting: client-id")
-	}
-	if o.ClientSecret == "" {
-		msgs = append(msgs, "missing setting: client-secret")
-	}
-
 	o.redirectUrl, msgs = parseUrl(o.RedirectUrl, "redirect", msgs)
 
 	for _, u := range o.Upstreams {
@@ -151,6 +148,10 @@ func (o *Options) Validate() error {
 				"cookie_expire (%s)",
 			o.CookieRefresh.String(),
 			o.CookieExpire.String()))
+	}
+
+	if o.AuthApiUrl != "" {
+		o.authApiUrl, msgs = parseUrl(o.AuthApiUrl, "auth-api", msgs)
 	}
 
 	if len(msgs) != 0 {
