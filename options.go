@@ -55,14 +55,14 @@ type Options struct {
 	RequestLogging bool `flag:"request-logging" cfg:"request_logging"`
 
 	// BuzzFeed Auth API options
-	AuthApiUrl string `flag:"auth-api-url" cfg:"auth_api_url"`
+	AuthApiUrl     string        `flag:"auth-api-url" cfg:"auth_api_url"`
+	AuthApiRefresh time.Duration `flag:"auth-api-refresh" cfg:"auth_api_refresh"`
 
 	// internal values that are set after config validation
 	redirectUrl   *url.URL
 	proxyUrls     []*url.URL
 	CompiledRegex []*regexp.Regexp
 	provider      providers.Provider
-	authApiUrl    *url.URL
 }
 
 func NewOptions() *Options {
@@ -155,10 +155,6 @@ func (o *Options) Validate() error {
 				"cookie_expire (%s)",
 			o.CookieRefresh.String(),
 			o.CookieExpire.String()))
-	}
-
-	if o.AuthApiUrl != "" {
-		o.authApiUrl, msgs = parseUrl(o.AuthApiUrl, "auth-api", msgs)
 	}
 
 	if len(msgs) != 0 {
