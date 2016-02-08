@@ -48,7 +48,8 @@ type OauthProxy struct {
 	compiledRegex       []*regexp.Regexp
 	templates           *template.Template
 
-	AuthApi *AuthApi
+	AuthApi         *AuthApi
+	UserInfoHandler *UserInfoHandler
 }
 
 type UpstreamProxy struct {
@@ -541,6 +542,13 @@ func (p *OauthProxy) Proxy(rw http.ResponseWriter, req *http.Request) {
 		rw.Header().Set("GAP-Auth", session.User)
 	} else {
 		rw.Header().Set("GAP-Auth", session.Email)
+	}
+
+	if p.UserInfoHandler != nil {
+		err := p.UserInfoHandler.Handle(rw, req, session)
+		if err != nil {
+			return
+		}
 	}
 
 	p.serveMux.ServeHTTP(rw, req)

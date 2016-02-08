@@ -64,7 +64,7 @@ func main() {
 	flagSet.String("scope", "", "Oauth scope specification")
 
 	flagSet.String("auth-api-url", "", "[http://]<addr>:<port>/<path> of the BuzzFeed Auth API endpoint")
-	flagSet.Bool("display-auth-api-form", true, "display authentication form for authenticating with BuzzFeed Auth API endpoint")
+	flagSet.Duration("auth-api-refresh", time.Duration(30), "auth-api refresh")
 
 	flagSet.Parse(os.Args[1:])
 
@@ -116,6 +116,11 @@ func main() {
 		oauthproxy.AuthApi, err = NewAuthApiFromUrl(opts.AuthApiUrl)
 		if err != nil {
 			log.Fatalf("Fatal: invalid auth api url %s", opts.AuthApiUrl)
+		}
+
+		oauthproxy.UserInfoHandler = &UserInfoHandler{
+			api:     oauthproxy.AuthApi,
+			refresh: opts.AuthApiRefresh,
 		}
 	}
 
