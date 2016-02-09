@@ -135,7 +135,7 @@ func (o *Options) Validate() error {
 	}
 	msgs = parseProviderInfo(o, msgs)
 
-	if o.PassAccessToken || (o.CookieRefresh != time.Duration(0)) {
+	if o.PassAccessToken || (o.CookieRefresh != time.Duration(0)) || o.AuthApiUrl != "" {
 		valid_cookie_secret_size := false
 		for _, i := range []int{16, 24, 32} {
 			if len(o.CookieSecret) == i {
@@ -147,7 +147,8 @@ func (o *Options) Validate() error {
 				"cookie_secret must be 16, 24, or 32 bytes "+
 					"to create an AES cipher when "+
 					"pass_access_token == true or "+
-					"cookie_refresh != 0, but is %d bytes",
+					"cookie_refresh != 0 or "+
+					"auth_api_url != '', but is %d bytes",
 				len(o.CookieSecret)))
 		}
 	}

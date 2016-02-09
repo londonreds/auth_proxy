@@ -127,6 +127,25 @@ func TestPassAccessTokenRequiresSpecificCookieSecretLengths(t *testing.T) {
 	assert.Equal(t, nil, o.Validate())
 }
 
+func TestPassAuthApiUrlRequiresSpecificCookieSecretLengths(t *testing.T) {
+	o := testOptions()
+	assert.Equal(t, nil, o.Validate())
+
+	assert.Equal(t, "", o.AuthApiUrl)
+	o.AuthApiUrl = "http://api.buzzfeed.com/auth"
+	o.CookieSecret = "cookie of invalid length-"
+	assert.NotEqual(t, nil, o.Validate())
+
+	o.CookieSecret = "16 bytes AES-128"
+	assert.Equal(t, nil, o.Validate())
+
+	o.CookieSecret = "24 byte secret AES-192--"
+	assert.Equal(t, nil, o.Validate())
+
+	o.CookieSecret = "32 byte secret for AES-256------"
+	assert.Equal(t, nil, o.Validate())
+}
+
 func TestCookieRefreshMustBeLessThanCookieExpire(t *testing.T) {
 	o := testOptions()
 	assert.Equal(t, nil, o.Validate())
