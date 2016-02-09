@@ -46,7 +46,7 @@ func main() {
 	flagSet.String("custom-templates-dir", "", "path to custom html templates")
 	flagSet.String("proxy-prefix", "/oauth2", "the url root path that this proxy should be nested under (e.g. /<oauth2>/sign_in)")
 
-	flagSet.String("cookie-name", "_oauth2_proxy", "the name of the cookie that the oauth_proxy creates")
+	flagSet.String("cookie-name", "_auth_proxy", "the name of the cookie that the oauth_proxy creates")
 	flagSet.String("cookie-secret", "", "the seed string for secure cookies")
 	flagSet.String("cookie-domain", "", "an optional cookie domain to force cookies to (ie: .yourcompany.com)*")
 	flagSet.Duration("cookie-expire", time.Duration(168)*time.Hour, "expire timeframe for cookie")
@@ -64,7 +64,8 @@ func main() {
 	flagSet.String("scope", "", "Oauth scope specification")
 
 	flagSet.String("auth-api-url", "", "[http://]<addr>:<port>/<path> of the BuzzFeed Auth API endpoint")
-	flagSet.Duration("auth-api-refresh", time.Duration(30), "auth-api refresh")
+	flagSet.Duration("auth-api-refresh", time.Hour*24, "auth-api refresh")
+	flagSet.String("auth-api-cookie-name", "_auth_proxy_user_info", "the name of the cookie for storing user info")
 
 	flagSet.Parse(os.Args[1:])
 
@@ -119,8 +120,12 @@ func main() {
 		}
 
 		oauthproxy.UserInfoHandler = &UserInfoHandler{
-			api:     oauthproxy.AuthApi,
-			refresh: opts.AuthApiRefresh,
+			api:            oauthproxy.AuthApi,
+			cookieExpire:   opts.AuthApiRefresh,
+			cookieName:     opts.AuthApiCookieName,
+			cookieSeed:     opts.CookieSecret,
+			cookieHttpOnly: opts.CookieHttpOnly,
+			cookieSecure:   opts.CookieSecure,
 		}
 	}
 

@@ -66,7 +66,7 @@
 ##            (ie: 1h means tokens are refreshed on request 1hr+ after it was set)
 ## Secure   - secure cookies are only sent by the browser of a HTTPS connection (recommended)
 ## HttpOnly - httponly cookies are not readable by javascript (recommended)
-# cookie_name = "_oauth2_proxy"
+# cookie_name = "_auth_proxy"
 # cookie_secret = ""
 # cookie_domain = ""
 # cookie_expire = "168h"

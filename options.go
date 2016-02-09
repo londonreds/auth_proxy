@@ -55,8 +55,9 @@ type Options struct {
 	RequestLogging bool `flag:"request-logging" cfg:"request_logging"`
 
 	// BuzzFeed Auth API options
-	AuthApiUrl     string        `flag:"auth-api-url" cfg:"auth_api_url"`
-	AuthApiRefresh time.Duration `flag:"auth-api-refresh" cfg:"auth_api_refresh"`
+	AuthApiUrl        string        `flag:"auth-api-url" cfg:"auth_api_url"`
+	AuthApiRefresh    time.Duration `flag:"auth-api-refresh" cfg:"auth_api_refresh"`
+	AuthApiCookieName string        `flag:"auth-api-cookie-name" cfg:"auth_api_cookie_name"`
 
 	// internal values that are set after config validation
 	redirectUrl   *url.URL
@@ -71,7 +72,7 @@ func NewOptions() *Options {
 		HttpAddress:         "127.0.0.1:4180",
 		HttpsAddress:        ":443",
 		DisplayHtpasswdForm: true,
-		CookieName:          "_oauth2_proxy",
+		CookieName:          "_auth_proxy",
 		CookieSecure:        true,
 		CookieHttpOnly:      true,
 		CookieExpire:        time.Duration(168) * time.Hour,
@@ -80,6 +81,8 @@ func NewOptions() *Options {
 		PassAccessToken:     false,
 		PassHostHeader:      true,
 		RequestLogging:      true,
+		AuthApiCookieName:   "_auth_proxy_user_info",
+		AuthApiRefresh:      time.Duration(24) * time.Hour,
 	}
 }
 

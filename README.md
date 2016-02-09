@@ -110,7 +110,7 @@ Usage of auth_proxy:
   -cookie-domain="": an optional cookie domain to force cookies to (ie: .yourcompany.com)*
   -cookie-expire=168h0m0s: expire timeframe for cookie
   -cookie-httponly=true: set HttpOnly cookie flag
-  -cookie-key="_oauth2_proxy": the name of the cookie that the oauth_proxy creates
+  -cookie-key="_auth_proxy": the name of the cookie that the auth_proxy creates
   -cookie-refresh=0: refresh the cookie after this duration; 0 to disable
   -cookie-secret="": the seed string for secure cookies
   -cookie-secure=true: set secure (HTTPS) cookie flag

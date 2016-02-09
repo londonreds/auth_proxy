@@ -412,7 +412,7 @@ func TestProcessCookieNoCookieError(t *testing.T) {
 	pc_test := NewProcessCookieTestWithDefaults()
 
 	session, _, err := pc_test.LoadCookiedSession()
-	assert.Equal(t, "Cookie \"_oauth2_proxy\" not present", err.Error())
+	assert.Equal(t, "Cookie \"_auth_proxy\" not present", err.Error())
 	if session != nil {
 		t.Errorf("expected nil session. got %#v", session)
 	}
