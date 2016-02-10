@@ -130,7 +130,7 @@ func (m *UserInfoHandler) FetchUserInfo(username string) (UserInfo, error) {
 
 	userInfo := make(map[string]string, 3)
 	userInfo["Roles"] = strings.Join(res.Roles, ",")
-	userInfo["Username"] = res.Username
+	userInfo["User"] = res.Username
 	userInfo["Email"] = res.Email
 
 	return userInfo, nil
