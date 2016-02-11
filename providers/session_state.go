@@ -15,6 +15,7 @@ type SessionState struct {
 	RefreshToken string
 	Email        string
 	User         string
+	AuthType     AuthType
 }
 
 func (s *SessionState) IsExpired() bool {
@@ -25,7 +26,7 @@ func (s *SessionState) IsExpired() bool {
 }
 
 func (s *SessionState) String() string {
-	o := fmt.Sprintf("Session{%s", s.userOrEmail())
+	o := fmt.Sprintf("Session{auth_method:%s user:%s", s.AuthType, s.userOrEmail())
 	if s.AccessToken != "" {
 		o += " token:true"
 	}
@@ -40,7 +41,7 @@ func (s *SessionState) String() string {
 
 func (s *SessionState) EncodeSessionState(c *cookie.Cipher) (string, error) {
 	if c == nil || s.AccessToken == "" {
-		return s.userOrEmail(), nil
+		return fmt.Sprintf("%s|%s", s.AuthType, s.userOrEmail()), nil
 	}
 	return s.EncryptedString(c)
 }
@@ -72,44 +73,47 @@ func (s *SessionState) EncryptedString(c *cookie.Cipher) (string, error) {
 			return "", err
 		}
 	}
-	return fmt.Sprintf("%s|%s|%d|%s", s.userOrEmail(), a, s.ExpiresOn.Unix(), r), nil
+	return fmt.Sprintf("%s|%s|%s|%d|%s", s.AuthType, s.userOrEmail(), a, s.ExpiresOn.Unix(), r), nil
 }
 
 func DecodeSessionState(v string, c *cookie.Cipher) (s *SessionState, err error) {
 	chunks := strings.Split(v, "|")
-	if len(chunks) == 1 {
-		if strings.Contains(chunks[0], "@") {
-			u := strings.Split(v, "@")[0]
-			return &SessionState{Email: v, User: u}, nil
+	authType := AuthTypeFromString(chunks[0])
+	if len(chunks) == 2 {
+		userOrEmail := chunks[1]
+		if strings.Contains(userOrEmail, "@") {
+			u := strings.Split(userOrEmail, "@")[0]
+
+			return &SessionState{AuthType: authType, Email: userOrEmail, User: u}, nil
 		}
-		return &SessionState{User: v}, nil
+		return &SessionState{AuthType: authType, User: userOrEmail}, nil
 	}
 
-	if len(chunks) != 4 {
-		err = fmt.Errorf("invalid number of fields (got %d expected 4)", len(chunks))
+	if len(chunks) != 5 {
+		err = fmt.Errorf("invalid number of fields (got %d expected 5)", len(chunks))
 		return
 	}
 
-	s = &SessionState{}
-	if c != nil && chunks[1] != "" {
-		s.AccessToken, err = c.Decrypt(chunks[1])
+	s = &SessionState{AuthType: authType}
+	if c != nil && chunks[2] != "" {
+		s.AccessToken, err = c.Decrypt(chunks[2])
 		if err != nil {
 			return nil, err
 		}
 	}
-	if c != nil && chunks[3] != "" {
-		s.RefreshToken, err = c.Decrypt(chunks[3])
+	if c != nil && chunks[4] != "" {
+		s.RefreshToken, err = c.Decrypt(chunks[4])
 		if err != nil {
 			return nil, err
 		}
 	}
-	if u := chunks[0]; strings.Contains(u, "@") {
+	if u := chunks[1]; strings.Contains(u, "@") {
 		s.Email = u
 		s.User = strings.Split(u, "@")[0]
 	} else {
 		s.User = u
 	}
-	ts, _ := strconv.Atoi(chunks[2])
+	ts, _ := strconv.Atoi(chunks[3])
 	s.ExpiresOn = time.Unix(int64(ts), 0)
 	return
 }

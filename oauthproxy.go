@@ -309,29 +309,29 @@ func (p *OauthProxy) SignInPage(rw http.ResponseWriter, req *http.Request, code 
 	p.templates.ExecuteTemplate(rw, "sign_in.html", t)
 }
 
-func (p *OauthProxy) ManualSignIn(rw http.ResponseWriter, req *http.Request) (string, bool) {
+func (p *OauthProxy) ManualSignIn(rw http.ResponseWriter, req *http.Request) (string, bool, providers.AuthType) {
 	if req.Method != "POST" || (p.HtpasswdFile == nil && p.AuthApi == nil) {
-		return "", false
+		return "", false, providers.AuthTypeNone
 	}
 	user := req.FormValue("username")
 	passwd := req.FormValue("password")
 	if user == "" {
-		return "", false
+		return "", false, providers.AuthTypeNone
 	}
 
 	// check basic auth
 	if p.HtpasswdFile != nil && p.HtpasswdFile.Validate(user, passwd) {
 		log.Printf("authenticated %q via HtpasswdFile", user)
-		return user, true
+		return user, true, providers.AuthTypeBasic
 	}
 
 	// check auth api auth
 	if p.AuthApi != nil && p.AuthApi.Validate(user, passwd) {
 		log.Printf("authenticated %q via AuthApi", user)
-		return user, true
+		return user, true, providers.AuthTypeApi
 	}
 
-	return "", false
+	return "", false, providers.AuthTypeNone
 }
 
 func (p *OauthProxy) GetRedirect(req *http.Request) (string, error) {
@@ -394,9 +394,9 @@ func (p *OauthProxy) SignIn(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	user, ok := p.ManualSignIn(rw, req)
+	user, ok, authType := p.ManualSignIn(rw, req)
 	if ok {
-		session := &providers.SessionState{User: user}
+		session := &providers.SessionState{AuthType: authType, User: user}
 		p.SaveSession(rw, req, session)
 		http.Redirect(rw, req, redirect, 302)
 	} else {
@@ -444,6 +444,7 @@ func (p *OauthProxy) OauthCallback(rw http.ResponseWriter, req *http.Request) {
 	// set cookie, or deny
 	if p.Validator(session.Email) {
 		log.Printf("%s authentication complete %s", remoteAddr, session)
+		session.AuthType = providers.AuthTypeOAuth2
 		err := p.SaveSession(rw, req, session)
 		if err != nil {
 			log.Printf("%s %s", remoteAddr, err)
@@ -544,12 +545,14 @@ func (p *OauthProxy) Proxy(rw http.ResponseWriter, req *http.Request) {
 		rw.Header().Set("GAP-Auth", session.Email)
 	}
 
-	if p.UserInfoHandler != nil {
+	if p.UserInfoHandler != nil && session.AuthType == providers.AuthTypeApi {
 		err := p.UserInfoHandler.Handle(rw, req, session)
 		if err != nil {
 			return
 		}
 	}
+
+	req.Header.Set("X-Forwarded-Auth-Type", session.AuthType.String())
 
 	p.serveMux.ServeHTTP(rw, req)
 }
@@ -576,7 +579,7 @@ func (p *OauthProxy) CheckBasicAuth(req *http.Request) (*providers.SessionState,
 	}
 	if p.HtpasswdFile.Validate(pair[0], pair[1]) {
 		log.Printf("authenticated %q via basic auth", pair[0])
-		return &providers.SessionState{User: pair[0]}, nil
+		return &providers.SessionState{AuthType: providers.AuthTypeBasic, User: pair[0]}, nil
 	}
 	return nil, fmt.Errorf("%s not in HtpasswdFile", pair[0])
 }

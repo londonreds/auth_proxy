@@ -1,6 +1,7 @@
 package providers
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 	"time"
@@ -22,10 +23,11 @@ func TestSessionStateSerialization(t *testing.T) {
 		AccessToken:  "token1234",
 		ExpiresOn:    time.Now().Add(time.Duration(1) * time.Hour),
 		RefreshToken: "refresh4321",
+		AuthType:     AuthTypeOAuth2,
 	}
 	encoded, err := s.EncodeSessionState(c)
 	assert.Equal(t, nil, err)
-	assert.Equal(t, 3, strings.Count(encoded, "|"))
+	assert.Equal(t, 4, strings.Count(encoded, "|"))
 
 	ss, err := DecodeSessionState(encoded, c)
 	t.Logf("%#v", ss)
@@ -34,6 +36,7 @@ func TestSessionStateSerialization(t *testing.T) {
 	assert.Equal(t, s.AccessToken, ss.AccessToken)
 	assert.Equal(t, s.ExpiresOn.Unix(), ss.ExpiresOn.Unix())
 	assert.Equal(t, s.RefreshToken, ss.RefreshToken)
+	assert.Equal(t, s.AuthType, ss.AuthType)
 
 	// ensure a different cipher can't decode properly (ie: it gets gibberish)
 	ss, err = DecodeSessionState(encoded, c2)
@@ -52,10 +55,11 @@ func TestSessionStateSerializationNoCipher(t *testing.T) {
 		AccessToken:  "token1234",
 		ExpiresOn:    time.Now().Add(time.Duration(1) * time.Hour),
 		RefreshToken: "refresh4321",
+		AuthType:     AuthTypeApi,
 	}
 	encoded, err := s.EncodeSessionState(nil)
 	assert.Equal(t, nil, err)
-	assert.Equal(t, s.Email, encoded)
+	assert.Equal(t, fmt.Sprintf("%s|%s", s.AuthType, s.Email), encoded)
 
 	// only email should have been serialized
 	ss, err := DecodeSessionState(encoded, nil)
