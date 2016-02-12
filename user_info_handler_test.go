@@ -83,6 +83,6 @@ func TestUserInfoFetch(t *testing.T) {
 	userInfo, err := handler.FetchUserInfo("test")
 	assert.Equal(t, err, nil)
 	assert.Equal(t, userInfo["Roles"], "test1,test2")
-	assert.Equal(t, userInfo["Username"], "test")
+	assert.Equal(t, userInfo["User"], "test")
 	assert.Equal(t, userInfo["Email"], "test@buzzfeed.com")
 }
