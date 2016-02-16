@@ -139,6 +139,6 @@ func (m *UserInfoHandler) FetchUserInfo(username string) (UserInfo, error) {
 func (m *UserInfoHandler) WriteForwardedHeaders(req *http.Request, data UserInfo) {
 	for key, value := range data {
 		headerKey := fmt.Sprintf("X-Forwarded-%s", key)
-		req.Header.Add(headerKey, value)
+		req.Header.Set(headerKey, value)
 	}
 }
