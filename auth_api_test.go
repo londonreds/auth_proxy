@@ -56,7 +56,7 @@ func TestAuthApiFetchUserInfo(t *testing.T) {
 
 	authApi, err := NewAuthApiFromUrl(backend.URL)
 	assert.Equal(t, err, nil)
-	response, err := authApi.FetchUserInfo("test")
+	response, _, err := authApi.FetchUserInfo("test")
 	assert.Equal(t, err, nil)
 	assert.Equal(t, response, stubResponse)
 }
@@ -69,7 +69,7 @@ func TestAuthApiFetchUserInfoFailure(t *testing.T) {
 
 	authApi, err := NewAuthApiFromUrl(backend.URL)
 	assert.Equal(t, err, nil)
-	response, err := authApi.FetchUserInfo("test")
+	response, _, err := authApi.FetchUserInfo("test")
 	assert.Equal(t, response == nil, true)
 	assert.Equal(t, err == nil, false)
 }

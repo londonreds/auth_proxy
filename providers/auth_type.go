@@ -11,18 +11,18 @@ const (
 
 func (authType AuthType) String() string {
 	return map[AuthType]string{
-		AuthTypeNone: "none",
+		AuthTypeNone:   "none",
 		AuthTypeOAuth2: "oauth2",
-		AuthTypeBasic: "basic_auth",
-		AuthTypeApi: "auth_api",
+		AuthTypeBasic:  "basic_auth",
+		AuthTypeApi:    "auth_api",
 	}[authType]
 }
 
 func AuthTypeFromString(s string) AuthType {
 	return map[string]AuthType{
-		"none": AuthTypeNone,
-		"oauth2": AuthTypeOAuth2,
+		"none":       AuthTypeNone,
+		"oauth2":     AuthTypeOAuth2,
 		"basic_auth": AuthTypeBasic,
-		"auth_api": AuthTypeApi,
+		"auth_api":   AuthTypeApi,
 	}[s]
 }
