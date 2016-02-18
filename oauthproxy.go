@@ -325,7 +325,7 @@ func (p *OauthProxy) ManualSignIn(rw http.ResponseWriter, req *http.Request) (st
 		return user, true, providers.AuthTypeBasic
 	}
 
-	// check auth api auth
+	// check auth api
 	if p.AuthApi != nil && p.AuthApi.Validate(user, passwd) {
 		log.Printf("authenticated %q via AuthApi", user)
 		return user, true, providers.AuthTypeApi
