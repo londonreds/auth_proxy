@@ -25,8 +25,10 @@ Vagrant.configure(2) do |config|
         ln -s /usr/local/gpm/bin/gpm /usr/local/bin
     fi
 
+    mkdir -p /opt/go/src/github.com/buzzfeed/auth_proxy/.godeps
+    chown -R vagrant:vagrant /opt/go/src/github.com/buzzfeed/auth_proxy/.godeps
     echo "export GOPATH=/opt/go/src/github.com/buzzfeed/auth_proxy/.godeps:/opt/go" > /etc/profile.d/go.sh
-    echo "export PATH=/opt/go/bin:$PATH" >> /etc/profile.d/go.sh
+    echo "export PATH=/opt/go/bin:/opt/go/src/github.com/buzzfeed/auth_proxy/.godeps/bin:$PATH" >> /etc/profile.d/go.sh
 
     if ! grep "cd /opt/go" /home/vagrant/.profile ; then
         echo "cd /opt/go/src/github.com/buzzfeed/auth_proxy" >> /home/vagrant/.profile
