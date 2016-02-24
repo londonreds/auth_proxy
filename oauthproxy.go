@@ -48,7 +48,7 @@ type OauthProxy struct {
 	compiledRegex       []*regexp.Regexp
 	templates           *template.Template
 
-	AuthApi         *AuthApi
+	AuthApi         AuthApi
 	UserInfoHandler *UserInfoHandler
 }
 
@@ -548,6 +548,9 @@ func (p *OauthProxy) Proxy(rw http.ResponseWriter, req *http.Request) {
 	if p.UserInfoHandler != nil && session.AuthType == providers.AuthTypeApi {
 		err := p.UserInfoHandler.Handle(rw, req, session)
 		if err != nil {
+			log.Printf("user info error: %s", err)
+			p.ClearCookie(rw, req)
+			p.SignInPage(rw, req, 403)
 			return
 		}
 	}

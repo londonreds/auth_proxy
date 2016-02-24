@@ -64,7 +64,7 @@ func main() {
 	flagSet.String("scope", "", "Oauth scope specification")
 
 	flagSet.String("auth-api-url", "", "[http://]<addr>:<port>/<path> of the BuzzFeed Auth API endpoint")
-	flagSet.Duration("auth-api-refresh", time.Hour*24, "auth-api refresh")
+	flagSet.Duration("auth-api-refresh", time.Hour*24, "refresh user info after this duration")
 	flagSet.String("auth-api-cookie-name", "_auth_proxy_user_info", "the name of the cookie for storing user info")
 
 	flagSet.Parse(os.Args[1:])
@@ -121,7 +121,8 @@ func main() {
 
 		oauthproxy.UserInfoHandler = &UserInfoHandler{
 			api:            oauthproxy.AuthApi,
-			cookieExpire:   opts.AuthApiRefresh,
+			refresh:        opts.AuthApiRefresh,
+			cookieExpire:   opts.CookieExpire,
 			cookieName:     opts.AuthApiCookieName,
 			cookieSeed:     opts.CookieSecret,
 			cookieHttpOnly: opts.CookieHttpOnly,
