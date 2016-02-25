@@ -2856,9 +2856,6 @@ func getTemplates() *template.Template {
       <div class="xs-col-12 xs-py2">
         <form method="GET" action="{{.ProxyPrefix}}/start">
           <input type="hidden" name="rd" value="{{.Redirect}}">
-          {{ if .SignInMessage }}
-          <p>{{.SignInMessage}}</p>
-          {{ end}}
           <button type="submit" class="button button--secondary xs-col-12 xs-my3">Log in with Your BuzzFeed Email</button>
         </form>
       </div>
