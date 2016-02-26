@@ -2870,7 +2870,7 @@ func getTemplates() *template.Template {
       <div class="xs-py2">
         <form method="POST" action="{{.ProxyPrefix}}/sign_in">
           <input type="hidden" name="rd" value="{{.Redirect}}">
-          <label class="form-label xs-pt3">Your Username or Email Address</label>
+          <label class="form-label xs-pt3">Your Username</label>
           <input type="text" name="username" class="text-input xs-col-12">
           <label class="form-label xs-pt2">Your Password</label>
           <input type="password" name="password" class="text-input xs-col-12">
