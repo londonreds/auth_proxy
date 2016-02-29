@@ -56,20 +56,34 @@ func TestAuthApiFetchUserInfo(t *testing.T) {
 
 	authApi, err := NewAuthApiFromUrl(backend.URL)
 	assert.Equal(t, err, nil)
-	response, _, err := authApi.FetchUserInfo("test")
+	response, userExists, err := authApi.FetchUserInfo("test")
 	assert.Equal(t, err, nil)
 	assert.Equal(t, response, stubResponse)
+	assert.Equal(t, userExists, true)
 }
 
 func TestAuthApiFetchUserInfoFailure(t *testing.T) {
-	backend := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(400)
-	}))
-	defer backend.Close()
+	testCases := []struct {
+		status int
+		userExists bool
+		err bool
+	}{
+		{400, false, true},
+		{404, false, false},
+		{403, false, false},
+	}
+	for _, testCase := range testCases {
+		backend := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(testCase.status)
+		}))
 
-	authApi, err := NewAuthApiFromUrl(backend.URL)
-	assert.Equal(t, err, nil)
-	response, _, err := authApi.FetchUserInfo("test")
-	assert.Equal(t, response == nil, true)
-	assert.Equal(t, err == nil, false)
+		authApi, err := NewAuthApiFromUrl(backend.URL)
+		assert.Equal(t, err, nil)
+		response, userExists, err := authApi.FetchUserInfo("test")
+		assert.Equal(t, err != nil, testCase.err)
+		assert.Equal(t, response == nil, true)
+		assert.Equal(t, userExists, testCase.userExists)
+
+		defer backend.Close()
+	}
 }

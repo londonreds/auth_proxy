@@ -1,3 +1,3 @@
 package main
 
-const VERSION = "2.0.1-buzzfeed0.9"
+const VERSION = "2.0.1-buzzfeed0.10"

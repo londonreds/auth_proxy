@@ -73,6 +73,11 @@ func (a *DefaultAuthApi) FetchUserInfo(username string) (*AuthApiResponse, bool,
 		return nil, false, nil
 	}
 
+	if resp.StatusCode == 403 {
+		log.Printf("user no longer active: %s", username)
+		return nil, false, nil
+	}
+
 	if resp.StatusCode != 200 {
 		err = fmt.Errorf("got %d from %q %s", resp.StatusCode, url, body)
 		log.Printf("unexpected status code: %s", err)
