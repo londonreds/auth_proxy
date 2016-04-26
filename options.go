@@ -56,6 +56,7 @@ type Options struct {
 
 	// BuzzFeed Auth API options
 	AuthApiUrl        string        `flag:"auth-api-url" cfg:"auth_api_url"`
+	AuthApiAuthToken  string	`flag:"auth-api-auth-token" cfg:"auth_api_auth_token"`
 	AuthApiRefresh    time.Duration `flag:"auth-api-refresh" cfg:"auth_api_refresh"`
 	AuthApiCookieName string        `flag:"auth-api-cookie-name" cfg:"auth_api_cookie_name"`
 

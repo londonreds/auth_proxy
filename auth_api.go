@@ -17,6 +17,7 @@ type AuthApi interface {
 
 type DefaultAuthApi struct {
 	url *url.URL
+	authToken string
 }
 
 type AuthApiRequest struct {
@@ -30,7 +31,7 @@ type AuthApiResponse struct {
 	Roles    []string `json:"roles"`
 }
 
-func NewAuthApiFromUrl(rawurl string) (*DefaultAuthApi, error) {
+func NewAuthApi(rawurl string, authToken string) (*DefaultAuthApi, error) {
 	url, err := url.Parse(rawurl)
 	if err != nil {
 		return nil, err
@@ -38,6 +39,7 @@ func NewAuthApiFromUrl(rawurl string) (*DefaultAuthApi, error) {
 
 	return &DefaultAuthApi{
 		url: url,
+		authToken: authToken,
 	}, nil
 }
 
@@ -51,6 +53,11 @@ func (a *DefaultAuthApi) FetchUserInfo(username string) (*AuthApiResponse, bool,
 	}
 
 	request.Header.Set("Content-Type", "application/json")
+
+	if a.authToken != "" {
+		log.Printf("setting X-Auth-Token")
+		request.Header.Set("X-Auth-Token", a.authToken)
+	}
 
 	log.Printf("making request to auth_api: %s", url)
 	resp, err := http.DefaultClient.Do(request)
@@ -108,6 +115,11 @@ func (a *DefaultAuthApi) Validate(username string, password string) bool {
 		return false
 	}
 	request.Header.Set("Content-Type", "application/json")
+
+	if a.authToken != "" {
+		log.Printf("setting X-Auth-Token")
+		request.Header.Set("X-Auth-Token", a.authToken)
+	}
 
 	log.Printf("making request to auth_api: %s for user: %q", a.url.String(), username)
 	resp, err := http.DefaultClient.Do(request)
