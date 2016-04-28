@@ -250,7 +250,7 @@ func TestUserInfoFetch(t *testing.T) {
 	}))
 	defer backend.Close()
 
-	authApi, err := NewAuthApiFromUrl(backend.URL)
+	authApi, err := NewAuthApi(backend.URL, "")
 	handler := &UserInfoHandler{
 		api:            authApi,
 		cookieExpire:   time.Minute,

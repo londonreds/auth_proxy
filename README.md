@@ -103,6 +103,7 @@ An example [oauth2_proxy.cfg](contrib/oauth2_proxy.cfg.example) config file is i
 ```
 Usage of auth_proxy:
   -auth-api-url="": [http://]<addr>:<port>/<path> of the BuzzFeed Auth API endpoint
+  -auth-api-auth-token="Auth Token to authenticate to the BuzzFeed Auth API":
   -auth-api-refresh="24h": refresh user info after this duration
   -auth-api-cookie-name="_auth_proxy_user_info": the name of the cookie for storing user info
   -authenticated-emails-file="": authenticate against emails via file (one per line)
