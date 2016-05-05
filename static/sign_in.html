@@ -6,9 +6,10 @@
   </head>
   <body>
     <!-- default  -->
-    <section class="xs-col-5 xs-border xs-p4 xs-mt3 xs-mx-auto">
-      <div class="login-form__header">
-        <h2 class="bold xs-text-center">Log in to BuzzFeed</h2>
+    <section class="xs-col-4 xs-border xs-p4 xs-mt3 xs-mx-auto">
+      <div class="login-form__header xs-text-center">
+        <h2 class="bold xs-pb2">Log in to BuzzFeed</h2>
+        <h5>Use your @buzzfeed.com email address or a BuzzFeed username.</h5>
       </div>
 
       <div class="xs-col-12 xs-py2">
@@ -28,9 +29,9 @@
       <div class="xs-py2">
         <form method="POST" action="{{.ProxyPrefix}}/sign_in">
           <input type="hidden" name="rd" value="{{.Redirect}}">
-          <label class="form-label xs-pt3">Your Username</label>
+          <label class="form-label xs-pt3">Your BuzzFeed username</label>
           <input type="text" name="username" class="text-input xs-col-12">
-          <label class="form-label xs-pt2">Your Password</label>
+          <label class="form-label xs-pt2">Your password</label>
           <input type="password" name="password" class="text-input xs-col-12">
           <button type="submit" class="xs-col-12 xs-mt3 button button--primary">Log in</button>
         </form>
@@ -39,6 +40,11 @@
       <!--
       <p class="text-gray--lightest text-6 xs-text-center">Secured with <a href="https://github.com/buzzfeed/auth_proxy#auth_proxy">Auth Proxy</a> version {{.Version}}</p>
        -->
+    </section>
+    <section class="footnote xs-col-4 xs-py4 xs-mx-auto text-4">
+        <p class="xs-pb1"><strong>Forgot your password?</strong></p>
+        <p class="xs-pb1">Advertisers, please contact your BuzzFeed Client Services Representative</p>
+        <p>Community users, <a target="_blank" href="community-user-login-instruction.html">please follow these instructions</a></p>
     </section>
   </body>
 </html>

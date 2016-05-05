@@ -16,7 +16,7 @@ type AuthApi interface {
 }
 
 type DefaultAuthApi struct {
-	url *url.URL
+	url       *url.URL
 	authToken string
 }
 
@@ -38,7 +38,7 @@ func NewAuthApi(rawurl string, authToken string) (*DefaultAuthApi, error) {
 	}
 
 	return &DefaultAuthApi{
-		url: url,
+		url:       url,
 		authToken: authToken,
 	}, nil
 }
