@@ -2896,7 +2896,7 @@ func getTemplates() *template.Template {
     <section class="footnote xs-col-4 xs-py4 xs-mx-auto text-4">
       <p class="xs-pb1"><strong>Forgot your password?</strong></p>
       <p class="xs-pb1">Advertisers, please contact your BuzzFeed Client Services Representative</p>
-      <p>Community users, <a target="_blank" href="community-user-login-instruction.html">please follow these instructions</a></p>
+      <p>Community users, <a target="_blank" href="{{.ProxyPrefix}}/forgot_password">please follow these instructions</a></p>
     </section>
     {{ end }}
   </body>
