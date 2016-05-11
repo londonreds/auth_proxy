@@ -28,11 +28,12 @@ type OauthProxy struct {
 	CookieRefresh  time.Duration
 	Validator      func(string) bool
 
-	RobotsPath        string
-	PingPath          string
-	SignInPath        string
-	OauthStartPath    string
-	OauthCallbackPath string
+	RobotsPath         string
+	PingPath           string
+	SignInPath         string
+	ForgotPasswordPath string
+	OauthStartPath     string
+	OauthCallbackPath  string
 
 	redirectUrl         *url.URL // the url to receive requests at
 	provider            providers.Provider
@@ -138,11 +139,12 @@ func NewOauthProxy(opts *Options, validator func(string) bool) *OauthProxy {
 		CookieRefresh:  opts.CookieRefresh,
 		Validator:      validator,
 
-		RobotsPath:        "/robots.txt",
-		PingPath:          "/ping",
-		SignInPath:        fmt.Sprintf("%s/sign_in", opts.ProxyPrefix),
-		OauthStartPath:    fmt.Sprintf("%s/start", opts.ProxyPrefix),
-		OauthCallbackPath: fmt.Sprintf("%s/callback", opts.ProxyPrefix),
+		RobotsPath:         "/robots.txt",
+		PingPath:           "/ping",
+		SignInPath:         fmt.Sprintf("%s/sign_in", opts.ProxyPrefix),
+		ForgotPasswordPath: fmt.Sprintf("%s/forgot_password", opts.ProxyPrefix),
+		OauthStartPath:     fmt.Sprintf("%s/start", opts.ProxyPrefix),
+		OauthCallbackPath:  fmt.Sprintf("%s/callback", opts.ProxyPrefix),
 
 		ProxyPrefix:     opts.ProxyPrefix,
 		provider:        opts.provider,
@@ -309,6 +311,15 @@ func (p *OauthProxy) SignInPage(rw http.ResponseWriter, req *http.Request, code 
 	p.templates.ExecuteTemplate(rw, "sign_in.html", t)
 }
 
+func (p *OauthProxy) ForgotPasswordPage(rw http.ResponseWriter, req *http.Request) {
+	t := struct {
+		ProxyPrefix string
+	}{
+		ProxyPrefix: p.ProxyPrefix,
+	}
+	p.templates.ExecuteTemplate(rw, "forgot_password.html", t)
+}
+
 func (p *OauthProxy) ManualSignIn(rw http.ResponseWriter, req *http.Request) (string, bool, providers.AuthType) {
 	if req.Method != "POST" || (p.HtpasswdFile == nil && p.AuthApi == nil) {
 		return "", false, providers.AuthTypeNone
@@ -378,6 +389,8 @@ func (p *OauthProxy) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		p.serveMux.ServeHTTP(rw, req)
 	case path == p.SignInPath:
 		p.SignIn(rw, req)
+	case path == p.ForgotPasswordPath:
+		p.ForgotPasswordPage(rw, req)
 	case path == p.OauthStartPath:
 		p.OauthStart(rw, req)
 	case path == p.OauthCallbackPath:

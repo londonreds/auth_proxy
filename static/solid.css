@@ -16,9 +16,18 @@ html {
 @font-face {
     font-family:'Proxima-Nova';
     src: url('fonts/ProximaNova-Regular-webfont.woff') format('woff'),
-         url('fonts/ProximaNova-Regular-webfont.woff2') format('woff2'),
-         url('fonts/ProximaNova-Semibold-webfont.woff') format('woff'),
-         url('fonts/ProximaNova-Semibold-webfont.woff') format('woff2');
+         url('fonts/ProximaNova-Regular-webfont.woff2') format('woff2');
+         font-weight: normal;
+         font-style: normal;
+         font-stretch: normal;
+}
+@font-face {
+    font-family:'Proxima-Nova';
+    src: url('fonts/ProximaNova-Semibold-webfont.woff') format('woff'),
+         url('fonts/ProximaNova-Semibold-webfont.woff2') format('woff2');
+         font-weight: bold;
+         font-style: normal;
+         font-stretch: normal;
 }
 
 /**

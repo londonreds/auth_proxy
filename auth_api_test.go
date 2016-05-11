@@ -98,9 +98,9 @@ func TestAuthApiAuthTokenHeader(t *testing.T) {
 
 func TestAuthApiFetchUserInfoFailure(t *testing.T) {
 	testCases := []struct {
-		status int
+		status     int
 		userExists bool
-		err bool
+		err        bool
 	}{
 		{400, false, true},
 		{404, false, false},
