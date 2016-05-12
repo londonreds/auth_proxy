@@ -338,10 +338,21 @@ func TestForgotPasswordPage(t *testing.T) {
 	opts.Validate()
 
 	proxy := NewOauthProxy(opts, func(string) bool { return true })
+	authApi, _ := NewAuthApi("127.0.0.1", "love-wins")
+	proxy.AuthApi = authApi
 	rw := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/oauth2/forgot_password", nil)
 	proxy.ServeHTTP(rw, req)
 	assert.Equal(t, 200, rw.Code)
+	match, _ := regexp.MatchString(".*Community user login reset instruction.*", rw.Body.String())
+	assert.Equal(t, match, true)
+
+	rw = httptest.NewRecorder()
+	req, _ = http.NewRequest("GET", "/oauth2/sign_in", nil)
+	proxy.ServeHTTP(rw, req)
+	assert.Equal(t, 200, rw.Code)
+	match, _ = regexp.MatchString("href=.*/oauth2/forgot_password.*", rw.Body.String())
+	assert.Equal(t, match, true)
 }
 
 type ProcessCookieTest struct {
