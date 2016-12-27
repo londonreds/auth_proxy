@@ -60,6 +60,9 @@ type Options struct {
 	AuthApiRefresh    time.Duration `flag:"auth-api-refresh" cfg:"auth_api_refresh"`
 	AuthApiCookieName string        `flag:"auth-api-cookie-name" cfg:"auth_api_cookie_name"`
 
+	// http-https redirect options
+	HttpHttpsRedirect bool `flag:"http-https-redirect" cfg:"http_https_redirect"`
+
 	// internal values that are set after config validation
 	redirectUrl   *url.URL
 	proxyUrls     []*url.URL
@@ -164,7 +167,7 @@ func (o *Options) Validate() error {
 
 	if len(msgs) != 0 {
 		return fmt.Errorf("Invalid configuration:\n  %s",
-			strings.Join(msgs, "\n  "))
+			strings.Join(msgs, "\n	"))
 	}
 	return nil
 }

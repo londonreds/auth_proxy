@@ -68,6 +68,8 @@ func main() {
 	flagSet.Duration("auth-api-refresh", time.Hour*24, "refresh user info after this duration")
 	flagSet.String("auth-api-cookie-name", "_auth_proxy_user_info", "the name of the cookie for storing user info")
 
+	flagSet.Bool("http-https-redirect", true, "redirect http requests to https")
+
 	flagSet.Parse(os.Args[1:])
 
 	if *showVersion {
@@ -132,7 +134,7 @@ func main() {
 	}
 
 	s := &Server{
-		Handler: LoggingHandler(os.Stdout, oauthproxy, opts.RequestLogging),
+		Handler: RedirectHandler(opts.HttpHttpsRedirect, LoggingHandler(os.Stdout, oauthproxy, opts.RequestLogging)),
 		Opts:    opts,
 	}
 	s.ListenAndServe()
