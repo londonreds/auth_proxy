@@ -2860,38 +2860,36 @@ func getTemplates() *template.Template {
     <section class="xs-col-4 xs-border xs-p4 xs-mt3 xs-mx-auto">
       <div class="login-form__header xs-text-center">
         <h2 class="bold xs-pb2">Log in to BuzzFeed</h2>
-        <h5>Use your @buzzfeed.com email address or a BuzzFeed username.</h5>
-      </div>
-
-      <div class="xs-col-12 xs-py2">
-        <form method="GET" action="{{.ProxyPrefix}}/start">
-          <input type="hidden" name="rd" value="{{.Redirect}}">
-          <button type="submit" class="button button--secondary xs-col-12 xs-my3">Log in with Your BuzzFeed Email</button>
-        </form>
       </div>
 
       {{ if .CustomLogin }}
-      <div class="login--divider clearfix xs-inline-block xs-col-12">
-        <div class="xs-col-5 xs-inline-block xs-relative xs-t1 xs-border-top xs-float-left"></div>
-        <div class="xs-col-2 circle xs-inline-block xs-text-center text-gray--lightest">OR</div>
-        <div class="xs-col-5 xs-inline-block xs-relative xs-t1 xs-border-top xs-float-right"></div>
-      </div>
-
       <div class="xs-py2">
         <form method="POST" action="{{.ProxyPrefix}}/sign_in">
           <input type="hidden" name="rd" value="{{.Redirect}}">
-          <label class="form-label xs-pt3">Your BuzzFeed Username</label>
+          <label class="form-label xs-pt3">Your BuzzFeed username <span class="regular">(Not email address)</span></label>
           <input type="text" name="username" class="text-input xs-col-12">
           <label class="form-label xs-pt2">Your password</label>
           <input type="password" name="password" class="text-input xs-col-12">
           <button type="submit" class="xs-col-12 xs-mt3 button button--primary">Log in</button>
         </form>
       </div>
+
+      <div class="login--divider clearfix xs-inline-block xs-col-12">
+        <div class="xs-col-12 xs-inline-block xs-relative xs-t1 xs-border-top xs-float-left"></div>
+      </div>
       {{ end }}
-      <!--
-      <p class="text-gray--lightest text-6 xs-text-center">Secured with <a href="https://github.com/buzzfeed/auth_proxy#auth_proxy">Auth Proxy</a> version {{.Version}}</p>
-       -->
+
+      <div class="xs-col-12 xs-pt5">
+        <div class="xs-text-center text-gray--lightest">
+          If you are a BuzzFeed employee...
+        </div>
+        <form method="GET" action="{{.ProxyPrefix}}/start">
+          <input type="hidden" name="rd" value="{{.Redirect}}">
+          <button type="submit" class="button button--secondary xs-col-12 xs-mt3">Log in with Your BuzzFeed Email</button>
+        </form>
+      </div>
     </section>
+
     {{ if .CustomLogin }}
     <section class="footnote xs-col-4 xs-py4 xs-mx-auto text-4">
       <p class="xs-pb1"><strong>Forgot your password?</strong></p>
