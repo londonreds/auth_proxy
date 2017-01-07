@@ -284,7 +284,7 @@ func (p *OauthProxy) ErrorPage(rw http.ResponseWriter, code int, title string, m
 	p.templates.ExecuteTemplate(rw, "error.html", t)
 }
 
-func (p *OauthProxy) SignInPage(rw http.ResponseWriter, req *http.Request, code int) {
+func (p *OauthProxy) SignInPage(rw http.ResponseWriter, req *http.Request, code int, err bool) {
 	p.ClearCookie(rw, req)
 	rw.WriteHeader(code)
 
@@ -300,6 +300,7 @@ func (p *OauthProxy) SignInPage(rw http.ResponseWriter, req *http.Request, code 
 		Redirect      string
 		Version       string
 		ProxyPrefix   string
+		Error         bool
 	}{
 		ProviderName:  p.provider.Data().ProviderName,
 		SignInMessage: p.SignInMessage,
@@ -307,6 +308,7 @@ func (p *OauthProxy) SignInPage(rw http.ResponseWriter, req *http.Request, code 
 		Redirect:      redirect_url,
 		Version:       VERSION,
 		ProxyPrefix:   p.ProxyPrefix,
+		Error:         err,
 	}
 	p.templates.ExecuteTemplate(rw, "sign_in.html", t)
 }
@@ -320,29 +322,29 @@ func (p *OauthProxy) ForgotPasswordPage(rw http.ResponseWriter, req *http.Reques
 	p.templates.ExecuteTemplate(rw, "forgot_password.html", t)
 }
 
-func (p *OauthProxy) ManualSignIn(rw http.ResponseWriter, req *http.Request) (string, bool, providers.AuthType) {
+func (p *OauthProxy) ManualSignIn(rw http.ResponseWriter, req *http.Request) (string, bool, providers.AuthType, bool) {
 	if req.Method != "POST" || (p.HtpasswdFile == nil && p.AuthApi == nil) {
-		return "", false, providers.AuthTypeNone
+		return "", false, providers.AuthTypeNone, false
 	}
 	user := req.FormValue("username")
 	passwd := req.FormValue("password")
 	if user == "" {
-		return "", false, providers.AuthTypeNone
+		return "", false, providers.AuthTypeNone, false
 	}
 
 	// check basic auth
 	if p.HtpasswdFile != nil && p.HtpasswdFile.Validate(user, passwd) {
 		log.Printf("authenticated %q via HtpasswdFile", user)
-		return user, true, providers.AuthTypeBasic
+		return user, true, providers.AuthTypeBasic, false
 	}
 
 	// check auth api
 	if p.AuthApi != nil && p.AuthApi.Validate(user, passwd) {
 		log.Printf("authenticated %q via AuthApi", user)
-		return user, true, providers.AuthTypeApi
+		return user, true, providers.AuthTypeApi, false
 	}
 
-	return "", false, providers.AuthTypeNone
+	return "", false, providers.AuthTypeNone, true
 }
 
 func (p *OauthProxy) GetRedirect(req *http.Request) (string, error) {
@@ -407,13 +409,13 @@ func (p *OauthProxy) SignIn(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	user, ok, authType := p.ManualSignIn(rw, req)
+	user, ok, authType, failed := p.ManualSignIn(rw, req)
 	if ok {
 		session := &providers.SessionState{AuthType: authType, User: user}
 		p.SaveSession(rw, req, session)
 		http.Redirect(rw, req, redirect, 302)
 	} else {
-		p.SignInPage(rw, req, 200)
+		p.SignInPage(rw, req, 200, failed)
 	}
 }
 
@@ -537,7 +539,7 @@ func (p *OauthProxy) Proxy(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	if session == nil {
-		p.SignInPage(rw, req, 403)
+		p.SignInPage(rw, req, 403, false)
 		return
 	}
 
@@ -563,7 +565,7 @@ func (p *OauthProxy) Proxy(rw http.ResponseWriter, req *http.Request) {
 		if err != nil {
 			log.Printf("user info error: %s", err)
 			p.ClearCookie(rw, req)
-			p.SignInPage(rw, req, 403)
+			p.SignInPage(rw, req, 403, false)
 			return
 		}
 	}
