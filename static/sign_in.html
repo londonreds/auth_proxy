@@ -15,10 +15,27 @@
       <div class="xs-py2">
         <form method="POST" action="{{.ProxyPrefix}}/sign_in">
           <input type="hidden" name="rd" value="{{.Redirect}}">
-          <label class="form-label xs-pt3">Your BuzzFeed username <span class="regular">(Not email address)</span></label>
-          <input type="text" name="username" class="text-input xs-col-12">
-          <label class="form-label xs-pt2">Your password</label>
-          <input type="password" name="password" class="text-input xs-col-12">
+          {{ if .Error }}
+            <fieldset class="fieldset form-fieldset--error">
+          {{ else }}
+            <fieldset class="fieldset">
+          {{ end }}
+            <label class="form-label xs-pt3">Your BuzzFeed username <span class="regular">(Not email address)</span></label>
+            <input type="text" name="username" class="text-input xs-col-12">
+          </fieldset>
+
+          {{ if .Error }}
+            <fieldset class="fieldset form-fieldset--error">
+          {{ else }}
+            <fieldset class="fieldset">
+          {{ end }}
+            <label class="form-label xs-pt2">Your password</label>
+            <input type="password" name="password" class="text-input xs-col-12">
+            {{ if .Error }}
+              <span class="form-feedback">Please provide a valid username and password.</span>
+            {{ end }}
+          </fieldset>
+
           <button type="submit" class="xs-col-12 xs-mt3 button button--primary">Log in</button>
         </form>
       </div>
