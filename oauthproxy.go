@@ -356,7 +356,7 @@ func (p *OauthProxy) GetRedirect(req *http.Request) (string, error) {
 
 	redirect := req.FormValue("rd")
 
-	if redirect == "" || !strings.HasPrefix(redirect, "/") {
+	if redirect == "" || !strings.HasPrefix(redirect, "/") || strings.HasPrefix(redirect, "//") {
 		redirect = "/"
 	}
 

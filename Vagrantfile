@@ -8,6 +8,7 @@ Vagrant.configure(2) do |config|
   config.vm.provision "shell", inline: <<-SHELL
     set -e
 
+    apt-get update
     apt-get install -y git
     chown -R vagrant:vagrant /opt/go
 
