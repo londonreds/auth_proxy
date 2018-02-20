@@ -356,11 +356,15 @@ func (p *OauthProxy) GetRedirect(req *http.Request) (string, error) {
 
 	redirect := req.FormValue("rd")
 
-	if redirect == "" || !strings.HasPrefix(redirect, "/") || strings.HasPrefix(redirect, "//") {
+	return p.verifyRedirect(redirect), nil
+}
+
+func (p *OauthProxy) verifyRedirect(redirect string) (string) {
+	if redirect == "" || !strings.HasPrefix(redirect, "/") || strings.HasPrefix(redirect, "//") || strings.Contains(redirect, "\\") {
 		redirect = "/"
 	}
 
-	return redirect, err
+	return redirect
 }
 
 func (p *OauthProxy) IsWhitelistedPath(path string) (ok bool) {

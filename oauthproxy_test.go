@@ -488,3 +488,18 @@ func TestProcessCookieFailIfRefreshSetAndCookieExpired(t *testing.T) {
 		t.Errorf("expected nil session %#v", session)
 	}
 }
+
+func verifyRedirect(t *testing.T, given string, expected string) {
+	OP := &OauthProxy{}
+	redirect := OP.verifyRedirect(given)
+	assert.Equal(t, redirect, expected)
+}
+
+func TestGetRedirect(t *testing.T) {
+	verifyRedirect(t, "garbage", "/")
+	verifyRedirect(t, "", "/")
+	verifyRedirect(t, "/real-uri", "/real-uri")
+	verifyRedirect(t, "http://example.com/", "/")
+	verifyRedirect(t, "//example.com/", "/")
+	verifyRedirect(t, "/\\\\example.com/", "/")
+}
