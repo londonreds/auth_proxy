@@ -328,7 +328,7 @@ func (p *OauthProxy) ManualSignIn(rw http.ResponseWriter, req *http.Request) (st
 	}
 	user := req.FormValue("username")
 	passwd := req.FormValue("password")
-	if user == "" {
+	if user == "" || strings.Contains(user, "@") {
 		return "", false, providers.AuthTypeNone, false
 	}
 
